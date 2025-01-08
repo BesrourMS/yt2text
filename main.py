@@ -4,6 +4,8 @@ import requests
 from typing import Dict, Any, List
 from datetime import datetime
 from youtube_transcript_api import YouTubeTranscriptApi
+import time
+import random
 
 # Set your Groq API key
 GROQ_API_KEY = "your_api_key"
@@ -131,7 +133,7 @@ def process_subtitles(subtitles: str) -> str:
     """
     Process subtitles using Groq API to separate speakers, handling large transcripts in chunks
     """
-    chunks = chunk_text(subtitles)
+    chunks = chunk_text(subtitles, chunk_size=3500)
     processed_chunks = []
     
     print(f"Processing transcript in {len(chunks)} chunks...")
@@ -147,6 +149,12 @@ def process_subtitles(subtitles: str) -> str:
         {chunk}
         """
         processed_chunk = groq_api_call(prompt, task="dialogue_formatting")
+        
+        # Add a random wait time between 5 and 10 seconds
+        wait_time = random.uniform(5, 10)
+        print(f"Waiting for {wait_time:.2f} seconds before the next API call...")
+        time.sleep(wait_time)
+        
         processed_chunks.append(processed_chunk)
     
     return "\n\n".join(processed_chunks)
@@ -170,6 +178,11 @@ def generate_article(transcript: str) -> str:
     {first_chunk}
     """
     article_chunks.append(groq_api_call(prompt, task="article_writing"))
+    
+    # Add a random wait time between 3 and 5 seconds
+    wait_time = random.uniform(5, 10)
+    print(f"Waiting for {wait_time:.2f} seconds before the next API call...")
+    time.sleep(wait_time)
     
     # Process middle chunks
     for i, chunk in enumerate(chunks[1:-1], 2):
@@ -238,6 +251,11 @@ def main():
         # Step 2: Process Subtitles
         print("🔄 Processing subtitles...")
         structured_transcript = process_subtitles(subtitles)
+        
+        # Add a random wait time between 5 and 10 seconds
+        wait_time = random.uniform(5, 10)
+        print(f"Waiting for {wait_time:.2f} seconds before Generating article...")
+        time.sleep(wait_time)
         
         # Step 3: Generate Article
         print("✍️ Generating article...")
