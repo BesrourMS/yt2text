@@ -232,6 +232,18 @@ def save_as_json(data: Dict[str, Any], file_name: str = "output.json") -> None:
     except IOError as e:
         raise Exception(f"Failed to save JSON file: {str(e)}")
 
+def fetch_oembed_data(video_url: str) -> Dict[str, Any]:
+    """
+    Fetch oEmbed data from YouTube API
+    """
+    oembed_url = f"https://youtube.com/oembed?url={video_url}&format=json"
+    try:
+        response = requests.get(oembed_url, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"Failed to fetch oEmbed data: {str(e)}")
+
 def main():
     """
     Main execution function with progress tracking and error handling
@@ -244,6 +256,12 @@ def main():
         
         print("\nStarting transcript processing pipeline...")
         
+        # Fetch oEmbed data
+        print("📥 Fetching oEmbed data...")
+        oembed_data = fetch_oembed_data(video_url)
+        video_title = oembed_data.get("title", "Unknown Title")
+        video_thumbnail = oembed_data.get("thumbnail_url", "")
+
         # Step 1: Download Subtitles
         print("📥 Downloading subtitles...")
         subtitles = download_subtitles(video_url)
@@ -269,6 +287,8 @@ def main():
         print("📊 Saving structured data...")
         output_data = {
             "video_url": video_url,
+            "title": video_title,
+            "thumbnail": video_thumbnail,
             "raw_subtitles": subtitles,
             "structured_transcript": structured_transcript,
             "article": article,
