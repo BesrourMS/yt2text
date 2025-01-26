@@ -61,6 +61,13 @@ The script generates three main output files:
 - `article.md`: Generated article in Markdown format
 - `output.json`: Complete data including raw subtitles, structured transcript, and article
 
+## Examples  
+
+Here’s an example of a video processed by the tool:  
+
+- **YouTube Video**: [How firefighting planes and helicopters are battling the LA fires](https://www.youtube.com/watch?v=0d-uc8p5GrE)  
+- **Generated Article**: [arida.tn/how-firefighting-planes-and-helicopters-are-battling-the-la-fires](https://arida.tn/how-firefighting-planes-and-helicopters-are-battling-the-la-fires)  
+
 ## Functions
 
 ### Core Functions
