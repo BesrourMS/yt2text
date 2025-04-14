@@ -1,0 +1,27 @@
+### 1. The New York Times Style Prompt
+**Prompt**:  
+"Convert the following transcript into a professional news article following *The New York Times* style. Use courtesy titles (e.g., Mr., Ms.) where appropriate, capitalize job titles when they appear before a name (e.g., 'President Joe Biden'), and ensure the tone reflects formal, authoritative journalism. Structure the article with a clear, concise lead followed by detailed reporting, and maintain a focus on factual accuracy and depth."
+
+---
+
+### 2. The Chicago Manual of Style (CMS) Prompt
+**Prompt**:  
+"Transform this transcript into a professional news article using *The Chicago Manual of Style*. Include the serial comma in lists, use footnotes for any necessary references or clarifications, and allow for a more narrative, flexible sentence structure. The article should have a polished, literary tone suitable for long-form journalism, with an emphasis on storytelling and comprehensive detail."
+
+---
+
+### 3. MLA Style Prompt
+**Prompt**:  
+"Generate a professional news article from this transcript in MLA style. Use parenthetical citations (e.g., (Smith 45)) for any direct quotes or references, and focus on clear, concise language. Structure the article to emphasize proper attribution and a logical flow of ideas, making it suitable for literary or cultural journalism. Ensure the tone is analytical yet accessible."
+
+---
+
+### 4. APA Style Prompt
+**Prompt**:  
+"Create a professional news article based on this transcript using APA style. Use author-date citations (e.g., Smith, 2020) for any referenced material, and structure the article with clear headings and subheadings to organize the content. Prioritize active voice for clarity and precision. The article should be data-driven and analytical, suitable for investigative or research-based journalism, with a focus on factual reporting and insight."
+
+---
+
+### 5. BBC Style Guide Prompt
+**Prompt**:  
+"Write a professional news article from this transcript following the BBC style guide. Use British English spelling (e.g., 'colour' instead of 'color'), prioritize plain language, and ensure the tone is impartial, accessible, and free of jargon. Structure the article for clarity and neutrality, focusing on factual reporting and avoiding subjective language. The article should be suitable for a global audience and adhere to principles of fairness and balance."

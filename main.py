@@ -1,5 +1,4 @@
 import json
-from pytube import YouTube
 import requests
 from typing import Dict, Any, List
 from datetime import datetime
@@ -143,7 +142,8 @@ def process_subtitles(subtitles: str) -> str:
         prompt = f"""
         Analyze this part of a subtitle file from a video and format it as a clear dialogue.
         Please separate the text by speaker and remove timestamp information.
-        If you recognize any speaker names, use them, otherwise distinguish between speakers by their speech patterns or content context without adding placeholder labels..
+        If you recognize any speaker names, use them. If names aren't available, identify speakers using natural, contextually appropriate role descriptions (e.g., "Researcher," "Interviewer," "Physician") based on their expertise, perspective, or function in the conversation. Format these roles as direct speaker labels rather than inserting phrases like "as an expert noted." Avoid generic labels like "Speaker 1" or "Speaker 2."
+
         
         Subtitle chunk:
         {chunk}

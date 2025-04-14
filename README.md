@@ -17,7 +17,6 @@ A Python tool that converts YouTube video transcripts into professionally format
 - Python 3.6+
 - Groq API key
 - Required Python packages:
-  - pytube
   - youtube-transcript-api
   - requests
   - typing
@@ -33,7 +32,7 @@ cd youtube-transcript-processor
 
 2. Install required packages:
 ```bash
-pip install pytube youtube-transcript-api requests
+pip install youtube-transcript-api requests
 ```
 
 3. Set up your Groq API key:
@@ -111,7 +110,6 @@ This project is licensed under the MIT License.
 ## Acknowledgments
 
 - Uses the Groq API for AI text processing
-- Built with pytube for YouTube video processing
 - Utilizes youtube-transcript-api for subtitle extraction
 
 ## Disclaimer
