@@ -3,6 +3,7 @@ import requests
 from typing import Dict, Any, List
 from datetime import datetime
 from youtube_transcript_api import YouTubeTranscriptApi
+from pytube import extract
 import time
 import random
 
@@ -64,15 +65,11 @@ def groq_api_call(prompt: str, task: str) -> str:
 
 def get_video_id(url: str) -> str:
     """
-    Extract video ID from YouTube URL
+    Extract video ID from YouTube URL using pytube's extract.video_id
     """
     try:
-        if "youtu.be" in url:
-            return url.split("/")[-1]
-        elif "youtube.com" in url:
-            return url.split("v=")[1].split("&")[0]
-        else:
-            raise ValueError("Invalid YouTube URL format")
+        video_id = extract.video_id(url)
+        return video_id
     except Exception:
         raise ValueError("Could not extract video ID from URL")
 
