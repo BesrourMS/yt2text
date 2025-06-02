@@ -6,35 +6,41 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from pytube import extract
 import time
 import random
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 # Set your Groq API key
 GROQ_API_KEY = "your_api_key"
 
-def chunk_text(text: str, chunk_size: int = 12000) -> List[str]:
+def chunk_text_with_langchain(text: str, chunk_size: int, chunk_overlap: int) -> List[str]:
     """
-    Split text into chunks based on SRT entries
+    Chunks text using LangChain's RecursiveCharacterTextSplitter.
+
+    Args:
+        text: The text to be chunked.
+        chunk_size: The maximum size of each chunk (in characters).
+        chunk_overlap: The number of characters to overlap between chunks.
+
+    Returns:
+        A list of text chunks.
     """
-    chunks = []
-    current_chunk = []
-    current_size = 0
-    
-    # Split into individual SRT entries
-    entries = text.strip().split('\n\n')
-    
-    for entry in entries:
-        entry_size = len(entry)
-        if current_size + entry_size > chunk_size and current_chunk:
-            chunks.append('\n\n'.join(current_chunk))
-            current_chunk = []
-            current_size = 0
+    text_splitter = RecursiveCharacterTextSplitter(
+        # The most important parameter: the maximum size of each chunk.
+        chunk_size=chunk_size,
         
-        current_chunk.append(entry)
-        current_size += entry_size
+        # A vital parameter for maintaining context between chunks.
+        # It creates a "sliding window" effect.
+        chunk_overlap=chunk_overlap,
+        
+        # Measures the length of chunks by number of characters.
+        length_function=len,
+        
+        # This is the "magic" of the splitter. It will try to split on these
+        # separators in order. The default is ["\n\n", "\n", " ", ""].
+        # For SRT files, this default is excellent.
+        is_separator_regex=False,
+    )
     
-    if current_chunk:
-        chunks.append('\n\n'.join(current_chunk))
-    
-    return chunks
+    return text_splitter.split_text(text)
 
 def groq_api_call(prompt: str, task: str) -> str:
     """
@@ -127,13 +133,16 @@ def format_time(seconds: float) -> str:
 
 def process_subtitles(subtitles: str) -> str:
     """
-    Process subtitles using Groq API to separate speakers, handling large transcripts in chunks
+    Process subtitles using Groq API to separate speakers, handling large transcripts in chunks.
     """
-    chunks = chunk_text(subtitles, chunk_size=3500)
+    # Using the new LangChain chunker
+    # A smaller chunk size is good for the detailed task of speaker identification.
+    # A small overlap helps maintain context of who was last speaking.
+    chunks = chunk_text_with_langchain(subtitles, chunk_size=3500, chunk_overlap=150)
     processed_chunks = []
-    
-    print(f"Processing transcript in {len(chunks)} chunks...")
-    
+
+    print(f"Processing transcript in {len(chunks)} chunks using LangChain splitter...")
+
     for i, chunk in enumerate(chunks, 1):
         print(f"Processing chunk {i}/{len(chunks)}...")
         prompt = f"""
@@ -146,65 +155,60 @@ def process_subtitles(subtitles: str) -> str:
         {chunk}
         """
         processed_chunk = groq_api_call(prompt, task="dialogue_formatting")
-        
+
         # Add a random wait time between 5 and 10 seconds
         wait_time = random.uniform(5, 10)
         print(f"Waiting for {wait_time:.2f} seconds before the next API call...")
         time.sleep(wait_time)
-        
+
         processed_chunks.append(processed_chunk)
-    
+
     return "\n\n".join(processed_chunks)
 
 def generate_article(transcript: str) -> str:
     """
-    Generate an article from the processed transcript, handling large transcripts in chunks
+    Generate an article from the processed transcript, handling large transcripts in chunks.
     """
-    chunks = chunk_text(transcript, chunk_size=10000)
+    # Using the LangChain chunker again, but with parameters tuned for article writing.
+    # A larger chunk size gives the model more context for summarization.
+    # A larger overlap ensures the narrative flows smoothly across chunks.
+    chunks = chunk_text_with_langchain(transcript, chunk_size=10000, chunk_overlap=500)
     article_chunks = []
+
+    print(f"Generating article in {len(chunks)} parts using LangChain splitter...")
     
-    print(f"Generating article in {len(chunks)} parts...")
+    # This logic can be simplified now, as we don't need special prompts for the first/last chunk
+    # thanks to the robustness of the chunking strategy.
     
-    # Process first chunk with introduction
-    first_chunk = chunks[0]
-    prompt = f"""
-    Convert this first part of an interview transcript into the beginning of a professional news article.
-    Include a strong introduction and follow AP style guidelines.
-    
-    Transcript part:
-    {first_chunk}
-    """
-    article_chunks.append(groq_api_call(prompt, task="article_writing"))
-    
-    # Add a random wait time between 3 and 5 seconds
-    wait_time = random.uniform(5, 10)
-    print(f"Waiting for {wait_time:.2f} seconds before the next API call...")
-    time.sleep(wait_time)
-    
-    # Process middle chunks
-    for i, chunk in enumerate(chunks[1:-1], 2):
-        print(f"Processing part {i}/{len(chunks)}...")
-        prompt = f"""
-        Continue the article with this part of the transcript.
-        Maintain the flow and journalistic style.
+    for i, chunk in enumerate(chunks, 1):
+        print(f"Generating article part {i}/{len(chunks)}...")
         
-        Transcript part:
+        # Determine the right prompt based on the chunk's position
+        if i == 1 and len(chunks) > 1:
+            prompt_template = "This is the first part of a transcript. Start writing a professional news article in AP style based on it. Include a strong introduction."
+        elif i == len(chunks) and len(chunks) > 1:
+            prompt_template = "This is the final part of a transcript. Continue the article based on it, providing a strong concluding paragraph."
+        elif len(chunks) == 1:
+            prompt_template = "Convert this transcript into a complete, professional news article in AP style, including an introduction and conclusion."
+        else: # Middle chunks
+            prompt_template = "This is a middle part of a transcript. Continue the news article in a consistent journalistic style based on this content."
+
+        prompt = f"""
+        {prompt_template}
+        
+        Transcript Part:
         {chunk}
         """
-        article_chunks.append(groq_api_call(prompt, task="article_writing"))
-    
-    # Process final chunk with conclusion
-    if len(chunks) > 1:
-        final_chunk = chunks[-1]
-        prompt = f"""
-        Conclude the article with this final part of the transcript.
-        Provide a strong closing and maintain journalistic style.
         
-        Transcript part:
-        {final_chunk}
-        """
-        article_chunks.append(groq_api_call(prompt, task="article_writing"))
-    
+        article_part = groq_api_call(prompt, task="article_writing")
+        article_chunks.append(article_part)
+
+        # Add a random wait time
+        if i < len(chunks):
+            wait_time = random.uniform(5, 10)
+            print(f"Waiting for {wait_time:.2f} seconds before the next API call...")
+            time.sleep(wait_time)
+
     return "\n\n".join(article_chunks)
 
 def save_as_markdown(article: str, file_name: str = "article.md") -> None:
@@ -233,7 +237,7 @@ def fetch_oembed_data(video_url: str) -> Dict[str, Any]:
     """
     Fetch oEmbed data from YouTube API
     """
-    oembed_url = f"https://youtube.com/oembed?url={video_url}&format=json"
+    oembed_url = f"https://www.youtube.com/oembed?url={video_url}&format=json"
     try:
         response = requests.get(oembed_url, timeout=10)
         response.raise_for_status()
