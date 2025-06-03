@@ -1,3 +1,4 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/BesrourMS/yt2text)
 # YouTube Transcript to Article Converter
 
 A Python tool that converts YouTube video transcripts into professionally formatted articles using the Groq AI API. This application downloads video subtitles, processes speaker dialogues, and generates well-structured news articles.
