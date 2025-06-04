@@ -81,41 +81,48 @@ def get_video_id(url: str) -> str:
 
 def download_subtitles(video_url: str) -> str:
     """
-    Download and extract English subtitles or auto-generated captions from a YouTube video
+    Download and extract English subtitles or auto-generated captions from a YouTube video,
+    preferring 'en-US' and 'en-GB' over general 'en' if available.
     """
     try:
         video_id = get_video_id(video_url)
         
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        
+        preferred_langs = ['en-US', 'en-GB', 'en']
+        
         try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-            
+            # Try to find a manually created transcript in preferred languages
+            transcript = transcript_list.find_manually_created_transcript(preferred_langs)
+        except:
             try:
-                transcript = transcript_list.find_manually_created_transcript(['en'])
+                # If not found, try a generated transcript in preferred languages
+                transcript = transcript_list.find_generated_transcript(preferred_langs)
             except:
-                try:
-                    transcript = transcript_list.find_generated_transcript(['en'])
-                except:
-                    transcript = transcript_list.find_transcript(['en'])
-                    if not transcript.is_translatable:
-                        raise ValueError("No translatable transcript found")
-                    transcript = transcript.translate('en')
+                # If still not found, find any translatable transcript and translate to 'en'
+                for t in transcript_list:
+                    if t.is_translatable:
+                        transcript = t.translate('en')
+                        break
+                else:
+                    raise ValueError("No translatable transcript found")
+        
+        # Fetch the transcript data
+        transcript_data = transcript.fetch()
+        
+        # Format the transcript into SRT format
+        srt_content = ""
+        for i, entry in enumerate(transcript_data, 1):
+            start_time = format_time(entry['start'])
+            end_time = format_time(entry['start'] + entry['duration'])
+            text = entry['text']
+            srt_content += f"{i}\n{start_time} --> {end_time}\n{text}\n\n"
+        
+        # Save to file and return the content
+        with open("transcript_raw.srt", "w", encoding="utf-8") as file:
+            file.write(srt_content)
             
-            transcript_data = transcript.fetch()
-            
-            srt_content = ""
-            for i, entry in enumerate(transcript_data, 1):
-                start_time = format_time(entry['start'])
-                end_time = format_time(entry['start'] + entry['duration'])
-                text = entry['text']
-                srt_content += f"{i}\n{start_time} --> {end_time}\n{text}\n\n"
-            
-            with open("transcript_raw.srt", "w", encoding="utf-8") as file:
-                file.write(srt_content)
-                
-            return srt_content
-            
-        except Exception as e:
-            raise Exception(f"Failed to get transcript: {str(e)}")
+        return srt_content
             
     except Exception as e:
         raise Exception(f"Failed to download subtitles: {str(e)}")
