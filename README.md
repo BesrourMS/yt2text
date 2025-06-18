@@ -1,118 +1,90 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/BesrourMS/yt2text)
-# YouTube Transcript to Article Converter
 
-A Python tool that converts YouTube video transcripts into professionally formatted articles using the Groq AI API. This application downloads video subtitles, processes speaker dialogues, and generates well-structured news articles.
+# **YouTube Transcript to Article Generator**
 
-## Features
+This Python script automates the process of extracting subtitles from a YouTube video, structuring them into a dialogue format with speaker identification, and then generating a professional news article based on the transcript. It leverages the Groq API for advanced text processing and LangChain's RecursiveCharacterTextSplitter for efficient text chunking.
 
-- Downloads YouTube video subtitles (both manual and auto-generated)
-- Supports multiple languages with automatic translation to English
-- Processes transcripts to identify and separate speakers
-- Generates professional news articles following AP style guidelines
-- Exports results in both Markdown and JSON formats
-- Implements smart chunking for handling long transcripts
-- Includes rate limiting and error handling
+## **Features**
 
-## Prerequisites
+* **YouTube Subtitle Download:** Automatically fetches English subtitles (manual or auto-generated) from a given YouTube video URL.  
+* **Speaker Separation:** Uses the Groq API to analyze transcripts, identify speakers (using names or contextual roles like "Researcher", "Interviewer"), and format the text into a clear dialogue.  
+* **Article Generation:** Converts the processed transcript into a coherent, professional news article in AP style.  
+* **Intelligent Text Chunking:** Employs LangChain's RecursiveCharacterTextSplitter to handle large transcripts by breaking them into manageable chunks for API processing, ensuring context is maintained.  
+* **Output Formats:** Saves the generated article as a Markdown file (article.md) and a comprehensive JSON file (output.json) containing all intermediate and final data.  
+* **Progress Tracking & Error Handling:** Provides console feedback during various stages of processing and includes robust error handling for API calls, subtitle downloads, and file operations.  
+* **Rate Limit Management:** Includes random delays between Groq API calls to help mitigate potential rate limiting issues.  
+* **Video Metadata Fetching:** Retrieves video title and thumbnail URL using YouTube's oEmbed API.
 
-- Python 3.6+
-- Groq API key
-- Required Python packages:
-  - youtube-transcript-api
-  - requests
-  - typing
-  - datetime
+## **Installation**
 
-## Installation
+1. **Clone the repository (or save the script):**  
+   git clone https://github.com/BesrourMS/yt2text/  
+   cd yt2text
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/youtube-transcript-processor.git
-cd youtube-transcript-processor
-```
+   (If you just have the script, save it as main.py for example)  
+2. Install dependencies:  
+   This script requires the following Python packages:  
+   * requests  
+   * youtube-transcript-api  
+   * pytube  
+   * langchain
 
-2. Install required packages:
-```bash
-pip install youtube-transcript-api requests
-```
+You can install them using pip:pip install requests youtube-transcript-api pytube langchain
 
-3. Set up your Groq API key:
-   - Create a Groq account and obtain your API key
-   - Replace `your_api_key` in the code with your actual API key
+## **API Key Setup**
 
-## Usage
+1. **Obtain a Groq API Key:**  
+   * Go to the [Groq Console](https://console.groq.com/).  
+   * Sign up or log in.  
+   * Navigate to the "API Keys" section and generate a new API key.  
+2. Configure the script:  
+   Open the main.py file and replace "your\_api\_key" with your actual Groq API key:  
+   \# Set your Groq API key  
+   GROQ\_API\_KEY \= "YOUR\_GROQ\_API\_KEY\_HERE"
 
-1. Run the script:
-```bash
-python main.py
-```
+   **Important:** For production environments, consider using environment variables to store your API key instead of hardcoding it directly in the script for security reasons.
 
-2. Enter a YouTube URL when prompted
-3. The script will:
-   - Download the video transcript
-   - Process the dialogue
-   - Generate an article
-   - Save outputs as both Markdown and JSON files
+## **Usage**
 
-## Output Files
+1. **Run the script:**  
+   python main.py
 
-The script generates three main output files:
-- `transcript_raw.srt`: Raw subtitle file in SRT format
-- `article.md`: Generated article in Markdown format
-- `output.json`: Complete data including raw subtitles, structured transcript, and article
+2. Enter YouTube URL:  
+   The script will prompt you to enter the YouTube video URL:  
+   Enter the YouTube video URL:
 
-## Examples  
+   Paste the full URL of the YouTube video you want to process (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ).  
+3. Monitor progress:  
+   The script will display messages in the console indicating its progress:  
+   * Downloading subtitles  
+   * Processing subtitles (chunk by chunk)  
+   * Generating article (chunk by chunk)  
+   * Saving files
 
-Here’s an example of a video processed by the tool:  
+## **Output Files**
 
-- **YouTube Video**: [How firefighting planes and helicopters are battling the LA fires](https://www.youtube.com/watch?v=0d-uc8p5GrE)  
-- **Generated Article**: [arida.tn/how-firefighting-planes-and-helicopters-are-battling-the-la-fires](https://arida.tn/how-firefighting-planes-and-helicopters-are-battling-the-la-fires)  
+Upon successful execution, the script will create the following files in the same directory:
 
-## Functions
+* transcript\_raw.srt: The raw, downloaded SRT formatted transcript of the video.  
+* article.md: The generated news article in Markdown format.  
+* output.json: A JSON file containing all the raw subtitles, structured transcript, the final article, and video metadata (title, thumbnail, URL).
 
-### Core Functions
+## **Error Handling**
 
-- `download_subtitles(video_url)`: Downloads and extracts YouTube subtitles
-- `process_subtitles(subtitles)`: Processes subtitles to identify speakers and format dialogue
-- `generate_article(transcript)`: Converts processed transcript into a news article
-- `chunk_text(text, chunk_size)`: Splits large texts into manageable chunks
+The script includes error handling for common issues such as:
 
-### Helper Functions
+* Invalid YouTube URL.  
+* Failure to download subtitles (e.g., no English transcripts available).  
+* Groq API call failures (network issues, invalid API key, rate limits).  
+* File saving errors.
 
-- `groq_api_call(prompt, task)`: Makes API calls to Groq
-- `get_video_id(url)`: Extracts video ID from YouTube URLs
-- `format_time(seconds)`: Converts seconds to SRT timestamp format
-- `save_as_markdown(article)`: Saves the article in Markdown format
-- `save_as_json(data)`: Saves all data in JSON format
+If an error occurs, an error message will be printed to the console.
 
-## Error Handling
+## **Customization**
 
-The script includes comprehensive error handling for:
-- Invalid YouTube URLs
-- Failed subtitle downloads
-- API call failures
-- File saving errors
-- Rate limiting issues
-
-## Rate Limiting
-
-The script implements random delays between API calls:
-- 5-10 seconds between transcript processing chunks
-- 3-5 seconds between article generation segments
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
-
-## Acknowledgments
-
-- Uses the Groq API for AI text processing
-- Utilizes youtube-transcript-api for subtitle extraction
-
-## Disclaimer
-
-This tool is dependent on YouTube's subtitle availability and quality. Results may vary based on the source video's transcript quality and availability.
+* **Chunking Parameters:** You can adjust chunk\_size and chunk\_overlap in chunk\_text\_with\_langchain for both subtitle processing and article generation to fine-tune how the text is divided.  
+  * process\_subtitles: uses smaller chunks and overlap for detailed speaker identification.  
+  * generate\_article: uses larger chunks and overlap for better contextual understanding during article generation.  
+* **Groq Model:** The script currently uses "llama-3.3-70b-versatile". You can change this to another available Groq model if desired.  
+* **Temperature:** The temperature parameter in groq\_api\_call (set to 0.7) controls the creativity of the AI. Lower values make the output more deterministic, while higher values lead to more varied and creative responses.  
+* **Wait Times:** The random wait times between API calls (random.uniform(5, 10)) can be adjusted if you encounter persistent rate limiting issues or wish to speed up/slow down the process.

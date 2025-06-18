@@ -88,16 +88,18 @@ def download_subtitles(video_url: str) -> str:
         video_id = get_video_id(video_url)
         
         transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-        
+        print("✅ Available transcripts:", [t.language_code for t in transcript_list])
         preferred_langs = ['en-US', 'en-GB', 'en']
         
         try:
             # Try to find a manually created transcript in preferred languages
             transcript = transcript_list.find_manually_created_transcript(preferred_langs)
+            print("🎯 Using manually created transcript.")
         except:
             try:
                 # If not found, try a generated transcript in preferred languages
                 transcript = transcript_list.find_generated_transcript(preferred_langs)
+                print("🎯 Using auto-generated transcript.")
             except:
                 # If still not found, find any translatable transcript and translate to 'en'
                 for t in transcript_list:
@@ -112,7 +114,7 @@ def download_subtitles(video_url: str) -> str:
         
         # Format the transcript into SRT format
         srt_content = ""
-        for i, entry in enumerate(transcript_data, 1):
+        for i, entry in enumerate(transcript_data.to_raw_data(), 1):
             start_time = format_time(entry['start'])
             end_time = format_time(entry['start'] + entry['duration'])
             text = entry['text']
