@@ -17,19 +17,23 @@ This Python script automates the process of extracting subtitles from a YouTube 
 
 ## **Installation**
 
-1. **Clone the repository (or save the script):**  
+1. **Clone the repository (or save the script):**
+   ```bash
    git clone https://github.com/BesrourMS/yt2text/  
    cd yt2text
-
+   ```
    (If you just have the script, save it as main.py for example)  
-2. Install dependencies:  
+3. Install dependencies:  
    This script requires the following Python packages:  
    * requests  
    * youtube-transcript-api  
    * pytube  
    * langchain
 
-You can install them using pip:pip install requests youtube-transcript-api pytube langchain
+You can install them using pip: 
+```python 
+pip install requests youtube-transcript-api pytube langchain
+```
 
 ## **API Key Setup**
 
@@ -39,22 +43,24 @@ You can install them using pip:pip install requests youtube-transcript-api pytub
    * Navigate to the "API Keys" section and generate a new API key.  
 2. Configure the script:  
    Open the main.py file and replace "your\_api\_key" with your actual Groq API key:  
-   \# Set your Groq API key  
-   GROQ\_API\_KEY \= "YOUR\_GROQ\_API\_KEY\_HERE"
-
+   ```python
+   # Set your Groq API key
+   GROQ_API_KEY = "YOUR_GROQ_API_KEY_HERE"
+   ```
    **Important:** For production environments, consider using environment variables to store your API key instead of hardcoding it directly in the script for security reasons.
 
 ## **Usage**
 
 1. **Run the script:**  
+```python
    python main.py
-
-2. Enter YouTube URL:  
+```
+3. Enter YouTube URL:  
    The script will prompt you to enter the YouTube video URL:  
    Enter the YouTube video URL:
 
-   Paste the full URL of the YouTube video you want to process (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ).  
-3. Monitor progress:  
+   Paste the full URL of the YouTube video you want to process (e.g., [https://www.youtube.com/watch?v=dQw4w9WgXcQ](https://www.youtube.com/watch?v=OpBGgntJqtM)).  
+4. Monitor progress:  
    The script will display messages in the console indicating its progress:  
    * Downloading subtitles  
    * Processing subtitles (chunk by chunk)  
